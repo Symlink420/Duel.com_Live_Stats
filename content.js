@@ -24,12 +24,13 @@
     };
     
     // Currency detection and formatting
-    let currentCurrency = 'USD'; // Default fallback
+    let currentCurrency = 'usd';
     const currencyMap = {
         'eur': { symbol: '€', code: 'EUR' },
+        'usd': { symbol: '$', code: 'USD' },
         'cad': { symbol: 'C$', code: 'CAD' },
-        'cny': { symbol: '¥', code: 'CNY' },
         'jpy': { symbol: '¥', code: 'JPY' },
+        'cny': { symbol: '¥', code: 'CNY' },
         'inr': { symbol: '₹', code: 'INR' },
         'idr': { symbol: 'Rp', code: 'IDR' },
         'nzd': { symbol: 'NZ$', code: 'NZD' },
@@ -37,11 +38,26 @@
         'dkk': { symbol: 'kr', code: 'DKK' },
         'try': { symbol: '₺', code: 'TRY' },
         'krw': { symbol: '₩', code: 'KRW' },
-        'usd': { symbol: '$', code: 'USD' },
+        'ars': { symbol: '$', code: 'ARS' },
+        'brl': { symbol: 'R$', code: 'BRL' },
         'usdt': { symbol: 'USDT', code: 'USDT' },
+        'usdc': { symbol: 'USDC', code: 'USDC' },
         'btc': { symbol: '₿', code: 'BTC' },
-        'eth': { symbol: 'Ξ', code: 'ETH' }
+        'eth': { symbol: 'Ξ', code: 'ETH' },
+        'bnb': { symbol: 'BNB', code: 'BNB' },
+        'sol': { symbol: 'SOL', code: 'SOL' },
+        'xrp': { symbol: 'XRP', code: 'XRP' },
+        'ltc': { symbol: 'Ł', code: 'LTC' },
+        'doge': { symbol: 'Ð', code: 'DOGE' },
+        'trx': { symbol: 'TRX', code: 'TRX' },
+        'bch': { symbol: 'BCH', code: 'BCH' },
+        'ada': { symbol: 'ADA', code: 'ADA' },
+        'link': { symbol: 'LINK', code: 'LINK' },
+        'avax': { symbol: 'AVAX', code: 'AVAX' },
+        'ton': { symbol: 'TON', code: 'TON' },
+        'hbar': { symbol: 'HBAR', code: 'HBAR' }
     };
+    const CURRENCY_CODES_REGEX = new RegExp('\\b(' + Object.keys(currencyMap).join('|') + ')\\s*$', 'i');
     
     // UI state
     let uiState = {
@@ -64,6 +80,7 @@
         createToggleButton();
         createStatsWindow();
         chrome.runtime.onMessage.addListener(handleMessage);
+        // Same stats UI (button + graph/recent toggles) on both plinko and keno
         chrome.storage.onChanged.addListener(handleStorageChange);
         interceptFetchRequests();
         if (isKeno) watchForKenoResults();
@@ -114,28 +131,21 @@
                 }
             }
             
-            // Fallback: bet input label (e.g. "Bet Amount" then "0 USDT")
-            if (currentCurrency === 'USD') {
+            if (currentCurrency === 'usd' || !currencyMap[currentCurrency]) {
                 const labelEl = document.querySelector('[data-testid="bet-input-label"]');
                 if (labelEl) {
-                    const text = labelEl.textContent || '';
-                    const cryptoMatch = text.match(/\s(USDT|BTC|ETH)\s*$/i);
-                    if (cryptoMatch && currencyMap[cryptoMatch[1].toLowerCase()]) {
-                        currentCurrency = cryptoMatch[1].toLowerCase();
-                    }
+                    const m = (labelEl.textContent || '').trim().match(CURRENCY_CODES_REGEX);
+                    if (m && currencyMap[m[1].toLowerCase()]) currentCurrency = m[1].toLowerCase();
                 }
             }
-            if (currentCurrency === 'USD') {
-                const currencyElements = document.querySelectorAll('[class*="currency"], [data-currency]');
+            if (currentCurrency === 'usd' || !currencyMap[currentCurrency]) {
+                const currencyElements = document.querySelectorAll('[class*="currency"], [data-currency], [data-testid*="currency"]');
                 for (const element of currencyElements) {
                     const text = element.textContent || element.getAttribute('data-currency') || '';
-                    const currencyMatch = text.match(/(EUR|CAD|CNY|JPY|INR|IDR|NZD|AUD|DKK|TRY|KRW|USD|USDT|BTC|ETH)/i);
-                    if (currencyMatch) {
-                        const code = currencyMatch[1].toLowerCase();
-                        if (currencyMap[code]) {
-                            currentCurrency = code;
-                            break;
-                        }
+                    const m = text.match(CURRENCY_CODES_REGEX);
+                    if (m && currencyMap[m[1].toLowerCase()]) {
+                        currentCurrency = m[1].toLowerCase();
+                        break;
                     }
                 }
             }
@@ -159,16 +169,16 @@
         const labelEl = document.querySelector('[data-testid="bet-input-label"]');
         let currency = currentCurrency;
         if (labelEl) {
-            const text = (labelEl.textContent || '').trim();
-            const m = text.match(/\s(USDT|BTC|ETH|EUR|USD|CAD|CNY|JPY|INR|IDR|NZD|AUD|DKK|TRY|KRW)\s*$/i);
+            const m = (labelEl.textContent || '').trim().match(CURRENCY_CODES_REGEX);
             if (m && currencyMap[m[1].toLowerCase()]) currency = m[1].toLowerCase();
         }
         return { amount, currency };
     }
 
     function formatCurrency(amount) {
-        const currency = currencyMap[currentCurrency] || currencyMap['usd'];
-        const symbol = currency.symbol;
+        const key = (currentCurrency || 'usd').toLowerCase();
+        const currency = currencyMap[key] || currencyMap['usd'];
+        const symbol = currency ? currency.symbol : (key.toUpperCase());
         const formattedAmount = Math.abs(amount).toFixed(2);
         return `${symbol}${formattedAmount}`;
     }
@@ -441,88 +451,62 @@
         };
     }
     
-    // Watch for bet results in the result history
     function watchForBetResults() {
-        let processedResults = new Set();
-        
-        // Function to process all visible results
+        const processedResults = new Set();
+        const PLINKO_SELECTORS = '[data-testid^="plinko-drop-result-"], [data-testid^="plinko-result-"]';
+
         function processAllResults() {
-            const resultElements = document.querySelectorAll('[data-testid^="plinko-drop-result-"]');
-            
-            // Process all visible results
+            const resultElements = document.querySelectorAll(PLINKO_SELECTORS);
             resultElements.forEach((element) => {
                 const resultId = element.getAttribute('data-testid');
-                if (!processedResults.has(resultId)) {
-                    const multiplierText = element.textContent.trim();
-                    const multiplier = parseFloat(multiplierText.replace('x', ''));
-                    const { amount: betAmount, currency: betCurrency } = getBetAmountAndCurrencyFromPage();
-                    if (betCurrency !== currentCurrency) {
-                        currentCurrency = betCurrency;
-                    }
-
-                    let riskLevel = "high";
-                    const riskButton = document.querySelector('[data-testid*="risk"], .risk-level, [class*="risk"]');
-                    if (riskButton) {
-                        const riskText = riskButton.textContent.toLowerCase();
-                        if (riskText.includes('low')) riskLevel = "low";
-                        else if (riskText.includes('medium')) riskLevel = "medium";
-                    }
-                    
-                    // Calculate actual values
-                    const winAmount = betAmount * multiplier;
-                    const profit = winAmount - betAmount;
-                    
-                    // Create bet data based on the result
-                    const mockBetData = {
-                        success: true,
-                        data: {
-                            id: resultId.replace('plinko-drop-result-', ''),
-                            payout_multiplier: multiplier.toString(),
-                            amount_currency: betAmount.toString(),
-                            win_amount: winAmount.toString(),
-                            profit: profit.toString(),
-                            risk_level: riskLevel,
-                            rows: 16, // Default for Plinko
-                            final_slot: Math.floor(Math.random() * 16) + 1 // Random slot
-                        }
-                    };
-                    
-                    processBetData(mockBetData);
-                    processedResults.add(resultId);
+                if (!resultId || processedResults.has(resultId)) return;
+                const multiplierText = (element.textContent || '').trim().replace(/^x\s*/i, '');
+                const multiplier = parseFloat(multiplierText.replace(/,/g, ''));
+                if (isNaN(multiplier)) return;
+                const { amount: betAmount, currency: betCurrency } = getBetAmountAndCurrencyFromPage();
+                if (betCurrency !== currentCurrency) currentCurrency = betCurrency;
+                let riskLevel = 'high';
+                const riskButton = document.querySelector('[data-testid*="risk"], .risk-level, [class*="risk"]');
+                if (riskButton) {
+                    const riskText = riskButton.textContent.toLowerCase();
+                    if (riskText.includes('low')) riskLevel = 'low';
+                    else if (riskText.includes('medium')) riskLevel = 'medium';
                 }
+                const winAmount = betAmount * multiplier;
+                const profit = winAmount - betAmount;
+                const id = resultId.replace(/^plinko-(?:drop-)?result-/, '');
+                const mockBetData = {
+                    success: true,
+                    data: {
+                        id,
+                        payout_multiplier: multiplier.toString(),
+                        amount_currency: betAmount.toString(),
+                        win_amount: winAmount.toString(),
+                        profit: profit.toString(),
+                        risk_level: riskLevel,
+                        rows: 16,
+                        final_slot: 0
+                    }
+                };
+                processBetData(mockBetData);
+                processedResults.add(resultId);
             });
         }
-        
-        // Watch for changes in the result area
+
         const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-                if (mutation.type === 'childList') {
-                    // Check if any result elements were added or removed
-                    const hasResultChanges = Array.from(mutation.addedNodes).some(node => 
-                        node.nodeType === Node.ELEMENT_NODE && 
-                        (node.matches && node.matches('[data-testid^="plinko-drop-result-"]') ||
-                         node.querySelector && node.querySelector('[data-testid^="plinko-drop-result-"]'))
-                    );
-                    
-                    if (hasResultChanges) {
-                        setTimeout(processAllResults, 100); // Small delay to ensure DOM is updated
-                    }
-                }
+            const hasResultChanges = mutations.some((m) => {
+                if (m.type !== 'childList' || !m.addedNodes.length) return false;
+                return Array.from(m.addedNodes).some((node) =>
+                    node.nodeType === Node.ELEMENT_NODE &&
+                    (node.matches && node.matches(PLINKO_SELECTORS) ||
+                     (node.querySelector && node.querySelector(PLINKO_SELECTORS)))
+                );
             });
+            if (hasResultChanges) setTimeout(processAllResults, 100);
         });
-        
-        // Start observing the entire document for result changes
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true
-        });
-        
-        // Also check for existing results
-        setTimeout(processAllResults, 1000);
-        
-        // Set up periodic checking as backup
+        observer.observe(document.body, { childList: true, subtree: true });
+        setTimeout(processAllResults, 800);
         setInterval(processAllResults, 2000);
-        
         setInterval(detectCurrency, 5000);
     }
 
