@@ -1,0 +1,530 @@
+/* Duel Live Stats Extension Styles */
+
+/* Toggle Button Styles */
+#duel-stats-toggle {
+    position: fixed !important;
+    bottom: 20px !important;
+    right: 80px !important;
+    width: 40px !important;
+    height: 40px !important;
+    background: linear-gradient(135deg, rgb(0, 150, 255) 0%, rgb(0, 0, 255) 100%) !important;
+    border-radius: 8px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    z-index: 9999 !important;
+    box-shadow: 0 4px 12px rgba(0, 150, 255, 0.4) !important;
+    transition: all 0.2s ease !important;
+    border: 1px solid rgb(31, 81, 255) !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+#duel-stats-toggle:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 16px rgba(0, 150, 255, 0.6);
+    background: linear-gradient(135deg, rgb(31, 81, 255) 0%, rgb(15, 82, 186) 100%) !important;
+}
+
+#duel-stats-toggle svg {
+    color: white;
+    width: 20px;
+    height: 20px;
+}
+
+/* Stats Window Styles */
+#duel-stats-window {
+    position: fixed;
+    width: 320px;
+    max-width: 90vw;
+    max-height: 80vh;
+    background: linear-gradient(135deg, rgb(0, 150, 255) 0%, rgb(0, 0, 255) 50%, rgb(31, 81, 255) 100%);
+    border-radius: 12px;
+    border: 2px solid rgb(15, 82, 186);
+    box-shadow: 0 8px 32px rgba(0, 150, 255, 0.5);
+    z-index: 9998;
+    overflow: hidden;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    color: #ffffff;
+    user-select: none;
+    backdrop-filter: blur(10px);
+    font-size: 14px; /* Base font size for proportional scaling */
+}
+
+/* Header Styles */
+.duel-stats-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.2em; /* Proportional to base font size */
+    background: transparent;
+    border-bottom: none;
+    cursor: grab;
+}
+
+.duel-stats-header:active {
+    cursor: grabbing;
+}
+
+.duel-logo {
+    display: flex;
+    align-items: center;
+    padding: 0.15em 0; /* Proportional padding */
+}
+
+.duel-logo svg {
+    height: 1.2em; /* Proportional to font size */
+    width: auto;
+    opacity: 0.9;
+}
+
+.duel-stats-controls {
+    display: flex;
+    gap: 0.6em; /* Proportional gap */
+}
+
+.duel-stats-controls button {
+    background: rgba(31, 81, 255, 0.3);
+    border: 1px solid rgb(15, 82, 186);
+    color: #ffffff;
+    border-radius: 0.4em; /* Proportional border radius */
+    padding: 0.6em; /* Proportional padding */
+    font-size: 0.9em; /* Proportional font size */
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 2.5em; /* Same size for both buttons */
+    height: 2.5em; /* Same size for both buttons */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.duel-stats-controls button svg {
+    width: 1em; /* Proportional to font size */
+    height: 1em;
+    stroke: currentColor;
+}
+
+.duel-stats-controls button:hover {
+    background: rgba(0, 150, 255, 0.4);
+    border-color: rgb(0, 150, 255);
+    transform: scale(1.05);
+}
+
+#duel-stats-reset {
+    color: #4ade80;
+    border-color: rgb(15, 82, 186);
+}
+
+#duel-stats-reset:hover {
+    background: rgba(74, 222, 128, 0.3);
+    border-color: #4ade80;
+}
+
+#duel-stats-close {
+    color: #f87171;
+    font-size: 0.9em; /* Match general button font size */
+    font-weight: 600;
+    border-color: rgb(15, 82, 186);
+}
+
+#duel-stats-close:hover {
+    background: rgba(248, 113, 113, 0.3);
+    border-color: #f87171;
+}
+
+/* Content Styles */
+.duel-stats-content {
+    padding: 0;
+    max-height: calc(80vh - 5.7em); /* Proportional to header height */
+    overflow-y: auto;
+    background: transparent;
+}
+
+/* Toggle Buttons */
+.duel-stats-toggles {
+    padding: 1.2em; /* Proportional to base font size */
+    background: transparent;
+    border-top: none;
+}
+
+.duel-toggle-group {
+    display: flex;
+    gap: 0.3em; /* Proportional gap */
+    background: rgba(31, 81, 255, 0.2);
+    border-radius: 0.6em; /* Proportional border radius */
+    padding: 0.3em; /* Proportional padding */
+    position: relative;
+    height: 2.9em; /* Proportional height */
+    border: 1px solid rgb(15, 82, 186);
+    backdrop-filter: blur(5px);
+}
+
+.duel-toggle-group::before {
+    content: '';
+    position: absolute;
+    left: 0.3em; /* Proportional positioning */
+    top: 0.3em;
+    height: calc(100% - 0.6em); /* Proportional height */
+    background: linear-gradient(135deg, rgb(0, 150, 255) 0%, rgb(31, 81, 255) 100%);
+    border-radius: 0.4em; /* Proportional border radius */
+    transition: all 0.2s ease;
+    z-index: 1;
+}
+
+.duel-toggle-btn {
+    flex: 1;
+    padding: 0.6em 0.9em; /* Proportional padding */
+    background: transparent;
+    border: none;
+    border-radius: 0.4em; /* Proportional border radius */
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.85em; /* Proportional font size */
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    position: relative;
+    z-index: 2;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.duel-toggle-btn.active {
+    color: #ffffff;
+}
+
+.duel-toggle-btn:hover {
+    color: #ffffff;
+}
+
+/* Graph Styles */
+.duel-stats-graph {
+    margin: 0;
+    background: transparent;
+    border: none;
+    box-shadow: none;
+}
+
+.duel-stats-graph h4 {
+    display: none;
+}
+
+.duel-graph-container {
+    background: rgba(31, 81, 255, 0.2); /* Match app's blue glass background */
+    border-radius: 0.9em; /* Proportional border radius */
+    padding: 0; /* No padding for full space usage */
+    border: 1px solid rgb(15, 82, 186); /* Match app's blue border */
+    margin: 1.2em; /* Proportional margin */
+    position: relative;
+    overflow: hidden;
+    min-height: 15em; /* Reduced height by 25% */
+    backdrop-filter: blur(5px); /* Match app's glass effect */
+    box-shadow: 
+        0 0 0 1px rgba(0, 150, 255, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1),
+        0 4px 20px rgba(0, 150, 255, 0.1); /* Match app's blue shadow */
+}
+
+.duel-graph-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(0, 150, 255, 0.1) 0%, rgba(31, 81, 255, 0.1) 100%); /* Match app's gradient */
+    pointer-events: none;
+    border-radius: inherit;
+    transition: all 0.3s ease;
+}
+
+.duel-graph-container:hover {
+    border-color: rgb(0, 150, 255); /* Match app's hover blue */
+    background: rgba(31, 81, 255, 0.3); /* Slightly more opaque on hover */
+    box-shadow: 
+        0 0 0 1px rgba(0, 150, 255, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15),
+        0 8px 32px rgba(0, 150, 255, 0.2); /* Match app's blue hover shadow */
+    transform: translateY(-2px);
+}
+
+#duel-profit-chart {
+    width: 100%;
+    height: 13.5em; /* Reduced height by 25% */
+    border-radius: 0.6em; /* Proportional border radius */
+    position: relative;
+    z-index: 1;
+    display: block;
+    background: transparent;
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+}
+
+.duel-stats-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.duel-stats-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.duel-stats-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.duel-stats-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Credit */
+.duel-stats-credit {
+    text-align: center;
+    padding: 0.4em 0.6em;
+    font-size: 0.7em;
+    color: rgba(255, 255, 255, 0.45);
+    letter-spacing: 0.5px;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Summary Stats */
+.duel-stats-summary {
+    margin: 0;
+    background: transparent;
+    border-radius: 0;
+    padding: 0.6em; /* Further reduced padding for more compact layout */
+    border: none;
+    display: grid;
+    grid-template-columns: 0.6fr 0.6fr; /* Reduced width by 40% (from 1fr to 0.6fr) */
+    gap: 0.6em; /* Further reduced gap for more compact layout */
+    justify-content: center; /* Center the boxes */
+}
+
+.duel-stat-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.1em; /* Further reduced gap */
+    padding: 0.4em; /* Further reduced padding for more compact layout */
+    border: 1px solid rgb(15, 82, 186);
+    border-radius: 0.5em; /* Slightly smaller border radius */
+    background: rgba(31, 81, 255, 0.2);
+    backdrop-filter: blur(5px);
+    align-items: center; /* Center text horizontally */
+    text-align: center; /* Center text content */
+}
+
+.duel-stat-label {
+    font-size: 0.75em; /* Smaller font size for more compact layout */
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.duel-stat-value {
+    font-size: 1.1em; /* Smaller font size for more compact layout */
+    color: #ffffff;
+    font-weight: 700;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.duel-stat-value.positive {
+    color: #4ade80;
+}
+
+.duel-stat-value.negative {
+    color: #f87171;
+}
+
+/* Risk Level Breakdown */
+.duel-stats-breakdown {
+    margin: 0;
+    background: transparent;
+    border-radius: 0;
+    padding: 16px;
+    border: none;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+}
+
+.duel-stats-breakdown h4 {
+    display: none;
+}
+
+
+/* Recent Bets */
+.duel-stats-recent {
+    background: transparent;
+    border-radius: 0;
+    padding: 1.2em; /* Proportional padding */
+    border: none;
+}
+
+.duel-stats-recent h4 {
+    margin: 0 0 0.9em 0; /* Proportional margin */
+    font-size: 0.85em; /* Proportional font size */
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.duel-recent-bets {
+    max-height: 8.6em; /* Proportional height */
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6em; /* Proportional gap */
+}
+
+.duel-recent-bet {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.6em 0.9em; /* Proportional padding */
+    background: rgba(31, 81, 255, 0.2);
+    border-radius: 0.4em; /* Proportional border radius */
+    border: 1px solid rgb(15, 82, 186);
+    backdrop-filter: blur(5px);
+}
+
+.duel-bet-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.duel-bet-amount {
+    font-size: 12px;
+    color: #ffffff;
+    font-weight: 600;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.duel-bet-multiplier {
+    font-size: 11px;
+    color: rgba(255, 255, 255, 0.7);
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.duel-bet-risk {
+    font-size: 9px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.duel-bet-risk.high {
+    background: rgba(248, 113, 113, 0.2);
+    color: #f87171;
+}
+
+.duel-bet-risk.medium {
+    background: rgba(251, 191, 36, 0.2);
+    color: #fbbf24;
+}
+
+.duel-bet-risk.low {
+    background: rgba(74, 222, 128, 0.2);
+    color: #4ade80;
+}
+
+.duel-bet-profit {
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+}
+
+.duel-bet-profit.positive {
+    color: #4ade80;
+}
+
+.duel-bet-profit.negative {
+    color: #f87171;
+}
+
+.duel-bet-time {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    margin-top: 2px;
+}
+
+/* Loading State */
+.duel-stats-loading {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.7);
+    font-style: italic;
+    padding: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+    #duel-stats-window {
+        width: 320px;
+        max-width: 95vw;
+    }
+    
+    .duel-stats-content {
+        padding: 16px;
+    }
+    
+    .duel-stats-header {
+        padding: 12px 16px;
+    }
+    
+    .duel-stats-header h3 {
+        font-size: 14px;
+    }
+}
+
+/* Animation for window appearance */
+#duel-stats-window {
+    animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Hover effects for interactive elements */
+.duel-stat-item:hover {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.duel-recent-bet:hover {
+    background: rgba(255, 255, 255, 0.05);
+    border-left-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Focus states for accessibility */
+#duel-stats-toggle:focus,
+.duel-stats-controls button:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Dark theme adjustments */
+@media (prefers-color-scheme: dark) {
+    #duel-stats-window {
+        background: rgba(18, 23, 49, 0.692);
+        border-color: rgba(255, 255, 255, 0.15);
+    }
+    
+    .duel-stats-header {
+        background: linear-gradient(135deg, rgb(12, 16, 43) 0%, rgba(2, 6, 255, 0.486) 100%);
+    }
+}

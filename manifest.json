@@ -1,0 +1,24 @@
+{
+  "manifest_version": 3,
+  "name": "Duel Live Stats",
+  "version": "1.0.0",
+  "description": "Track live Plinko & Keno betting statistics on Duel.com",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://duel.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["https://duel.com/plinko*", "https://duel.com/keno*"],
+      "js": ["content.js"],
+      "css": ["styles.css"],
+      "run_at": "document_idle"
+    }
+  ]
+}
